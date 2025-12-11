@@ -1,0 +1,13 @@
+{
+  "name": "docker-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for microservices architecture",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server -p 80 --cors",
+    "build": "echo 'Frontend is static, no build needed'"
+  },
+  "keywords": [],
+  "author": "Ulises García",
+  "license": "ISC"
+}
