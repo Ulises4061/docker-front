@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microservicios - Ulises García</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .author {
+            color: #667eea;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        
+        .status {
+            background: #f0f4ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .status.connected {
+            background: #f0fff4;
+            border-left-color: #48bb78;
+        }
+        
+        .status.disconnected {
+            background: #fff5f5;
+            border-left-color: #f56565;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-indicator.online {
+            background: #48bb78;
+            box-shadow: 0 0 10px #48bb78;
+        }
+        
+        .status-indicator.offline {
+            background: #f56565;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            color: #667eea;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background: #764ba2;
+        }
+        
+        button.delete {
+            background: #f56565;
+        }
+        
+        button.delete:hover {
+            background: #e53e3e;
+        }
+        
+        .user-list {
+            list-style: none;
+        }
+        
+        .user-item {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #667eea;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .user-email {
+            color: #718096;
+            font-size: 0.9em;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .message {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .message.show {
+            display: block;
+        }
+        
+        .message.success {
+            background: #f0fff4;
+            color: #22543d;
+            border-left: 4px solid #48bb78;
+        }
+        
+        .message.error {
+            background: #fff5f5;
+            color: #742a2a;
+            border-left: 4px solid #f56565;
+        }
+        
+        .info-box {
+            background: #edf2f7;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #cbd5e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Microservicios Docker</h1>
+            <p class="author">Por: Ulises García</p>
+        </header>
+        
+        <div class="status connected" id="status">
+            <span class="status-indicator online" id="indicator"></span>
+            <span id="statusText">API: Conectado</span>
+        </div>
+        
+        <div class="message" id="message"></div>
+        
+        <div class="section">
+            <h2>ℹ️ Información</h2>
+            <div class="info-box">
+                <p><strong>Nombre:</strong> <span id="authorName">Cargando...</span></p>
+                <p><strong>Endpoint Personal:</strong> <code>/garcia</code></p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>➕ Agregar Nuevo Usuario</h2>
+            <div class="form-group">
+                <label for="userName">Nombre:</label>
+                <input type="text" id="userName" placeholder="Ingrese nombre">
+            </div>
+            <div class="form-group">
+                <label for="userEmail">Email:</label>
+                <input type="email" id="userEmail" placeholder="Ingrese email">
+            </div>
+            <button onclick="addUser()">Agregar Usuario</button>
+        </div>
+        
+        <div class="section">
+            <h2>👥 Lista de Usuarios</h2>
+            <button onclick="loadUsers()">🔄 Actualizar Lista</button>
+            <ul class="user-list" id="userList">
+                <li class="user-item">
+                    <span>Cargando usuarios...</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'http://localhost:5000';
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            checkConnection();
+            loadAuthorInfo();
+            loadUsers();
+            
+            // Recargar cada 30 segundos
+            setInterval(loadUsers, 30000);
+        });
+        
+        // Verificar conexión con la API
+        function checkConnection() {
+            fetch(`${API_URL}/health`)
+                .then(response => response.json())
+                .then(data => {
+                    updateStatus(true, data.author);
+                })
+                .catch(error => {
+                    updateStatus(false);
+                    console.error('Error de conexión:', error);
+                });
+        }
+        
+        // Actualizar estado de conexión
+        function updateStatus(connected, author = '') {
+            const status = document.getElementById('status');
+            const indicator = document.getElementById('indicator');
+            const statusText = document.getElementById('statusText');
+            
+            if (connected) {
+                status.classList.remove('disconnected');
+                status.classList.add('connected');
+                indicator.classList.add('online');
+                indicator.classList.remove('offline');
+                statusText.textContent = `✅ API: Conectado - ${author}`;
+            } else {
+                status.classList.remove('connected');
+                status.classList.add('disconnected');
+                indicator.classList.remove('online');
+                indicator.classList.add('offline');
+                statusText.textContent = '❌ API: Desconectado';
+            }
+        }
+        
+        // Cargar información del autor
+        function loadAuthorInfo() {
+            fetch(`${API_URL}/garcia`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('authorName').textContent = data.fullName;
+                })
+                .catch(error => {
+                    console.error('Error al obtener información del autor:', error);
+                    document.getElementById('authorName').textContent = 'Error al cargar';
+                });
+        }
+        
+        // Cargar usuarios
+        function loadUsers() {
+            fetch(`${API_URL}/api/users`)
+                .then(response => response.json())
+                .then(data => {
+                    renderUsers(data);
+                    checkConnection();
+                })
+                .catch(error => {
+                    console.error('Error al cargar usuarios:', error);
+                    document.getElementById('userList').innerHTML = 
+                        '<li class="user-item"><span>Error al cargar usuarios</span></li>';
+                    updateStatus(false);
+                });
+        }
+        
+        // Renderizar usuarios
+        function renderUsers(users) {
+            const userList = document.getElementById('userList');
+            
+            if (users.length === 0) {
+                userList.innerHTML = '<li class="user-item"><span>No hay usuarios registrados</span></li>';
+                return;
+            }
+            
+            userList.innerHTML = users.map(user => `
+                <li class="user-item">
+                    <div class="user-info">
+                        <div class="user-name">${user.name}</div>
+                        <div class="user-email">${user.email}</div>
+                    </div>
+                    <div class="user-actions">
+                        <button class="delete" onclick="deleteUser(${user.id})">Eliminar</button>
+                    </div>
+                </li>
+            `).join('');
+        }
+        
+        // Agregar usuario
+        function addUser() {
+            const name = document.getElementById('userName').value.trim();
+            const email = document.getElementById('userEmail').value.trim();
+            
+            if (!name || !email) {
+                showMessage('Por favor complete todos los campos', 'error');
+                return;
+            }
+            
+            fetch(`${API_URL}/api/users`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                showMessage('Usuario agregado exitosamente', 'success');
+                document.getElementById('userName').value = '';
+                document.getElementById('userEmail').value = '';
+                loadUsers();
+            })
+            .catch(error => {
+                showMessage('Error al agregar usuario', 'error');
+                console.error('Error:', error);
+            });
+        }
+        
+        // Eliminar usuario
+        function deleteUser(id) {
+            if (!confirm('¿Está seguro de eliminar este usuario?')) return;
+            
+            fetch(`${API_URL}/api/users/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                showMessage('Usuario eliminado exitosamente', 'success');
+                loadUsers();
+            })
+            .catch(error => {
+                showMessage('Error al eliminar usuario', 'error');
+                console.error('Error:', error);
+            });
+        }
+        
+        // Mostrar mensaje
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = `message show ${type}`;
+            
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Verificar conexión cada 10 segundos
+        setInterval(checkConnection, 10000);
+    </script>
+</body>
+</html>
